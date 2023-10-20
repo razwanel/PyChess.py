@@ -17,15 +17,20 @@ pygame.init()
 
 # Define parameters
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+BLACK =(0, 0, 0)
+PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
+
+
+#swap
+AUX=PINK
+PINK=BROWN
+BROWN=AUX
 
 SIZE = 800
 
 # Font
-
-font = pygame.font.SysFont('arial',20)
-
+font = pygame.font.SysFont('arial',25)
 
 # Set up the display
 screen_size = (SIZE, SIZE)
@@ -85,68 +90,71 @@ def draw_pieces():
             for j in range (8):
                 match(pieces[i][j]):
                     case 10: #
-                        text = font.render('p', True , BLACK)
+                        text = font.render('p', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 1: #P
-                        text = font.render('P', True , BLACK)
+                        text = font.render('P', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 50: #r
-                        text = font.render('r', True , BLACK)
+                        text = font.render('r', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 5: #R
-                        text = font.render('R', True , BLACK)
+                        text = font.render('R', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 30: #n
-                        text = font.render('n', True , BLACK)
+                        text = font.render('n', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 3: #N
-                        text = font.render('N', True , BLACK)
+                        text = font.render('N', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 40: #b
-                        text = font.render('b', True , BLACK)
+                        text = font.render('b', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 4: #B
-                        text = font.render('B', True , BLACK)
+                        text = font.render('B', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 90: #q
-                        text = font.render('q', True , BLACK)
+                        text = font.render('q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 9: #Q
-                        text = font.render('Q', True , BLACK)
+                        text = font.render('Q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 20: #k
-                        text = font.render('k', True , BLACK)
+                        text = font.render('k', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case 2: #K
-                        text = font.render('K', True , BLACK)
+                        text = font.render('K', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)                    
                     case _:
                         pass
-                                          
+
+# Check for click
+
+
 # Main loop
 def main():
 
@@ -156,6 +164,9 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+        
+        
+        
         draw_board()   
         set_start()
         draw_pieces()
