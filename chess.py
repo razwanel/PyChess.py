@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+# from .header import *
 
 # chess pieces # White , Black
 P , p = 1 , 10 # pawn
@@ -44,10 +45,10 @@ square_size = screen_size[0] // 8
 FILES = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Vertical lines
 RANKS = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Horizontal lines
 
-# Array to store pieces in each position
+# Array to store piece positions
 pieces = np.array([[0]*8]*8) 
 
-# starting postion for pieces 
+# Set starting postion for pieces 
 def set_start():
         for i in range(8):
             for j in range(8):
@@ -83,6 +84,7 @@ def draw_board():
             for col in FILES:
                 square_color = WHITE if (row + col) % 2 == 0 else BROWN
                 pygame.draw.rect(screen, square_color, (col * square_size, row * square_size, square_size, square_size))
+
 
 # Draw the pieces using 'pieces' array
 def draw_pieces():
@@ -151,37 +153,71 @@ def draw_pieces():
                         screen.blit(text, textRect)                    
                     case _:
                         pass
+    
+    
+# Mouse position -> board square
+def mouse_square(x):
+    j = x[0] // square_size
+    i = x[1] // square_size
 
-# Check for click
+    return i,j
+
+# Highlight square 
+def highlight(sq):                                  # P1  P2
+    x = sq[1] * square_size                         #   X
+    y = sq[0] * square_size                         # P4  P3 
+    P1=(x + square_size/10 , y + square_size/10)
+    P2=(x + 9/10 * square_size , y + square_size/10)
+    P3=(x + 9/10 * square_size , y + 9/10 * square_size)   
+    P4=(x + square_size/10 , y + 9/10 * square_size)    
+    pygame.draw.polygon(screen, (255,0,0), [P1,P2,P3,P4], width=5)   
+    #print('debug' + str(P3))                     
+                                    
+# Move piece
+def move(activeSq , bool):
+    if pieces[activeSq]:
+        selected = pieces[activeSq]
+        
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    takeSquare = mouse_square(event.pos)
+                    pieces[takeSquare] = selected
+                    pieces[activeSq] = 0
+                elif event.button == 3:
+                    bool = False
+    return bool
 
 
 # Main loop
 def main():
-
+    highlightBool = False
+    activeSquare = 0
+    set_start()
     running = True
+
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    activeSquare = mouse_square(event.pos)
+                    highlightBool = True
 
+                    
+
+                
         
+        draw_board() 
+        if highlightBool:
+            highlight(activeSquare)  
         
-        
-        draw_board()   
-        set_start()
+        if activeSquare:
+            move(activeSquare , highlightBool)
         draw_pieces()
         
-        
-        
-
-
-
-
-
-
-
-
-
         pygame.display.flip()
 
 
