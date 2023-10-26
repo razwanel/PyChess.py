@@ -178,15 +178,15 @@ def move(activeSq , bool):
     if pieces[activeSq]:
         selected = pieces[activeSq]
         
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    takeSquare = mouse_square(event.pos)
-                    pieces[takeSquare] = selected
-                    pieces[activeSq] = 0
-                elif event.button == 3:
-                    bool = False
-    return bool
+        event = pygame.event.wait()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                takeSquare = mouse_square(event.pos)
+                pieces[takeSquare] = selected
+                pieces[activeSq] = 0
+            #elif event.button == 3:
+            #    bool = False
+    #return bool
 
 
 # Main loop
@@ -194,6 +194,7 @@ def main():
     highlightBool = False
     activeSquare = 0
     set_start()
+    print(pieces)
     running = True
 
     
@@ -205,6 +206,7 @@ def main():
                 if event.button == 1:
                     activeSquare = mouse_square(event.pos)
                     highlightBool = True
+                else: highlightBool = False
 
                     
 
@@ -219,7 +221,6 @@ def main():
         draw_pieces()
         
         pygame.display.flip()
-
 
 main()
 
