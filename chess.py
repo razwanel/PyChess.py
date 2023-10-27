@@ -22,6 +22,9 @@ BLACK =(0, 0, 0)
 PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
 
+highlightBool = False
+activeSquare = 0
+
 
 #swap
 AUX=PINK
@@ -174,7 +177,9 @@ def highlight(sq):                                  # P1  P2
     #print('debug' + str(P3))                     
                                     
 # Move piece
-def move(activeSq , bool):
+def move(activeSq):
+    global highlightBool
+
     if pieces[activeSq]:
         selected = pieces[activeSq]
         
@@ -184,17 +189,20 @@ def move(activeSq , bool):
                 takeSquare = mouse_square(event.pos)
                 pieces[takeSquare] = selected
                 pieces[activeSq] = 0
-            #elif event.button == 3:
-            #    bool = False
-    #return bool
+                highlightBool = False
+            if event.button == 3:
+                highlightBool = False
+
+
+            
 
 
 # Main loop
 def main():
-    highlightBool = False
-    activeSquare = 0
+    global highlightBool
+    global activeSquare
+
     set_start()
-    print(pieces)
     running = True
 
     
@@ -205,7 +213,8 @@ def main():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     activeSquare = mouse_square(event.pos)
-                    highlightBool = True
+                    if pieces[activeSquare]:
+                        highlightBool = True
                 else: highlightBool = False
 
                     
@@ -215,9 +224,7 @@ def main():
         draw_board() 
         if highlightBool:
             highlight(activeSquare)  
-        
-        if activeSquare:
-            move(activeSquare , highlightBool)
+            move(activeSquare)
         draw_pieces()
         
         pygame.display.flip()
