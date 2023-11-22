@@ -3,12 +3,14 @@ import numpy as np
 # from .header import *
 
 # chess pieces # White , Black
-P , p = 1 , 10 # pawn
-R , r = 5 , 50 # rook
-B , b = 4 , 40 # biishop
-N , n = 3 , 30 # knight
-Q , q = 9 , 90 # queen
-K , k = 2 , 20 # king
+
+class cs:
+    P , p = 1 , 11 # pawn
+    R , r = 5 , 50 # rook
+    B , b = 4 , 40 # biishop
+    N , n = 3 , 30 # knight
+    Q , q = 9 , 90 # queen
+    K , k = 2 , 20 # king
 
 
 
@@ -53,32 +55,42 @@ pieces = np.array([[0]*8]*8)
 
 # Set starting postion for pieces 
 def set_start():
-        for i in range(8):
+        '''
+            for i in range(8):
             for j in range(8):
                 match (i,j):
                     case (1,j):
-                        pieces[i][j] = p
+                        pieces[i][j] = cs.p
                     case (6,j):
-                        pieces[i][j] = P
+                        pieces[i][j] = cs.P
                     case _:
                         pieces[i][j] = 0
-        pieces[0][0]= r
-        pieces[0][1]= n
-        pieces[0][2]= b
-        pieces[0][3]= q
-        pieces[0][4]= k
-        pieces[0][5]= b
-        pieces[0][6]= n
-        pieces[0][7]= r
+        pieces[0][0]= cs.r
+        pieces[0][1]= cs.n
+        pieces[0][2]= cs.b
+        pieces[0][3]= cs.q
+        pieces[0][4]= cs.k
+        pieces[0][5]= cs.b
+        pieces[0][6]= cs.n
+        pieces[0][7]= cs.r
 
-        pieces[7][0]= R
-        pieces[7][1]= N
-        pieces[7][2]= B
-        pieces[7][3]= Q
-        pieces[7][4]= K
-        pieces[7][5]= B
-        pieces[7][6]= N
-        pieces[7][7]= R
+        pieces[7][0]= cs.R
+        pieces[7][1]= cs.N
+        pieces[7][2]= cs.B
+        pieces[7][3]= cs.Q
+        pieces[7][4]= cs.K
+        pieces[7][5]= cs.B
+        pieces[7][6]= cs.N
+        pieces[7][7]= cs.R
+'''
+pieces = [[cs.r, cs.n, cs.b, cs.q, cs.k, cs.b, cs.n, cs.r],
+    [cs.p, cs.p, cs.p, cs.p, cs.p, cs.p, cs.p, cs.p],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [cs.P, cs.P, cs.P, cs.P, cs.P, cs.P, cs.P, cs.P],
+    [cs.R, cs.N, cs.B, cs.Q, cs.K, cs.B, cs.N, cs.R]]    
 
 # Draw the chessboard
 def draw_board():
@@ -91,65 +103,66 @@ def draw_board():
 
 # Draw the pieces using 'pieces' array
 def draw_pieces():
-        for i in range(8):
+    
+    for i in range(8):
             for j in range (8):
                 match(pieces[i][j]):
-                    case 10: #
+                    case cs.p: #p
                         text = font.render('p', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 1: #P
+                    case cs.P: #P
                         text = font.render('P', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 50: #r
+                    case cs.r: #r
                         text = font.render('r', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 5: #R
+                    case cs.R: #R
                         text = font.render('R', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 30: #n
+                    case cs.n: #n
                         text = font.render('n', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 3: #N
+                    case cs.N: #N
                         text = font.render('N', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 40: #b
+                    case cs.b: #b
                         text = font.render('b', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 4: #B
+                    case cs.B: #B
                         text = font.render('B', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 90: #q
+                    case cs.q: #q
                         text = font.render('q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 9: #Q
+                    case cs.Q: #Q
                         text = font.render('Q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 20: #k
+                    case cs.k: #k
                         text = font.render('k', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
-                    case 2: #K
+                    case cs.K: #K
                         text = font.render('K', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
@@ -164,6 +177,27 @@ def mouse_square(x):
     i = x[1] // square_size
 
     return i,j
+
+"""
+# Check piece colour (White = 1 ; Black = 2 ; empty = 0)
+def isWhite(pos):
+    global pieces
+    j, i = pos
+    if i<8 and j<8 and i>=0 and j>=0:
+        #print(f'isWhite: {pieces[i][j]<10}\n')
+        print(pos)
+        print(pieces[i][j])
+        if 0 < pieces[i][j] < 10:
+            return 1
+        if pieces[i][j] >= 10:
+            return 2
+        if pieces[i][j] == 0: 
+            return 0
+
+        
+
+    else: print('isWhite_error: position not whithin board bounds')
+"""
 
 # Highlight square 
 def highlight(sq):                                  # P1  P2
@@ -181,17 +215,41 @@ def move(activeSq):
     global highlightBool
 
     if pieces[activeSq]:
-        selected = pieces[activeSq]
         
         event = pygame.event.wait()
+        
         if event.type == pygame.MOUSEBUTTONDOWN:
+            
             if event.button == 1:
                 takeSquare = mouse_square(event.pos)
-                pieces[takeSquare] = selected
+                pieces[takeSquare] = pieces[activeSq]
                 pieces[activeSq] = 0
                 highlightBool = False
+
             if event.button == 3:
                 highlightBool = False
+
+def legal(start , finish): # start, finish = squares (j, i)
+
+    start_value = pieces[start[1]][start[0]] 
+    finish_value = pieces[finish[1]][finish[0]]
+
+    same_colour = start_value <10 == finish_value <10    
+    
+    if same_colour:
+        return False
+
+    match(start_value):
+        
+        
+        
+        case _: pass 
+    
+
+
+    
+
+    
 
 
             
@@ -233,3 +291,11 @@ main()
 
 # Quit pygame
 pygame.quit()
+
+#ai facut functie de verificat culoarea, implementeaza in move() sa verifice
+#daca piesa pe care o ia este de alta culoare
+#adik pe scurt mai bn te apuci sa faci o functie legalMove() 
+#bafta
+
+
+#nu merge coaie isWhite()... vezi cf
