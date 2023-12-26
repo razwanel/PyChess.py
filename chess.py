@@ -7,12 +7,12 @@ import numpy as np
 class cs:
     P , p = 1 , 11 # pawn
     R , r = 5 , 50 # rook
-    B , b = 4 , 40 # biishop
+    B , b = 4 , 40 # bishop
     N , n = 3 , 30 # knight
     Q , q = 9 , 90 # queen
     K , k = 2 , 20 # king
 
-
+# atribut culoare?
 
 
 # Initialize pygame
@@ -55,8 +55,8 @@ pieces = np.array([[0]*8]*8)
 
 # Set starting postion for pieces 
 def set_start():
-        '''
-            for i in range(8):
+        
+        for i in range(8):
             for j in range(8):
                 match (i,j):
                     case (1,j):
@@ -82,23 +82,16 @@ def set_start():
         pieces[7][5]= cs.B
         pieces[7][6]= cs.N
         pieces[7][7]= cs.R
-'''
-pieces = [[cs.r, cs.n, cs.b, cs.q, cs.k, cs.b, cs.n, cs.r],
-    [cs.p, cs.p, cs.p, cs.p, cs.p, cs.p, cs.p, cs.p],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [cs.P, cs.P, cs.P, cs.P, cs.P, cs.P, cs.P, cs.P],
-    [cs.R, cs.N, cs.B, cs.Q, cs.K, cs.B, cs.N, cs.R]]    
+
+   
 
 # Draw the chessboard
 def draw_board():
         
-        for row in RANKS:
-            for col in FILES:
-                square_color = WHITE if (row + col) % 2 == 0 else BROWN
-                pygame.draw.rect(screen, square_color, (col * square_size, row * square_size, square_size, square_size))
+    for row in RANKS:
+        for col in FILES:
+            square_color = WHITE if (row + col) % 2 == 0 else BROWN
+            pygame.draw.rect(screen, square_color, (col * square_size, row * square_size, square_size, square_size))
 
 
 # Draw the pieces using 'pieces' array
@@ -176,7 +169,7 @@ def mouse_square(x):
     j = x[0] // square_size
     i = x[1] // square_size
 
-    return i,j
+    return i,j #returneaza x,y; (0,0) e coltul din stanga sus
 
 """
 # Check piece colour (White = 1 ; Black = 2 ; empty = 0)
@@ -222,38 +215,143 @@ def move(activeSq):
             
             if event.button == 1:
                 takeSquare = mouse_square(event.pos)
-                pieces[takeSquare] = pieces[activeSq]
-                pieces[activeSq] = 0
+                if legal(activeSq, takeSquare):
+                    pieces[takeSquare] = pieces[activeSq]
+                    pieces[activeSq] = 0
                 highlightBool = False
 
             if event.button == 3:
                 highlightBool = False
 
-def legal(start , finish): # start, finish = squares (j, i)
+def colour(pieceValue):
 
-    start_value = pieces[start[1]][start[0]] 
-    finish_value = pieces[finish[1]][finish[0]]
-
-    same_colour = start_value <10 == finish_value <10    
+    if pieceValue in range(1,10):
+        #print("colour: White")
+        return "White"
+    if pieceValue > 10 :
+        #print("colour: Black")
+        return "Black"
+    if pieceValue == 0 :
+        #print("colour: Empty")
+        return "Empty"
     
-    if same_colour:
+def canTake(attackValue , defendValue):
+    print("canTake:")
+    print(( colour(attackValue) == "White" ) and ( colour(defendValue)  == "Black" ) or \
+           ( colour(attackValue) == "Black" ) and ( colour(defendValue)  == "White" ))
+    
+    return ( colour(attackValue) == "White" ) and ( colour(defendValue)  == "Black" ) or \
+           ( colour(attackValue) == "Black" ) and ( colour(defendValue)  == "White" )
+
+def legal(start , finish): # start, finish = pieces (i , j)
+    #start, finish = board(y, x)
+    #print(f"start: {start}")
+    #print(f"finish: {finish}")
+    start_value = pieces[start] 
+    finish_value = pieces[finish]
+    #print(f"Start value:{start_value}")
+    #print(f"Finish value:{finish_value}")
+    
+    same_colour = colour(start_value) == colour(finish_value)   
+    
+    if same_colour: 
         return False
 
+    startX , startY = start[1] , start[0]
+    finishX , finishY = finish[1] , finish[0]
+    
+    
+
     match(start_value):
+    #implementeaza cazuri pt piese    
         
+        case cs.p: 
+            if (startX == finishX) and (finishY == 3) and (startY == 1): #first move !!poate sari piese
+                return finish_value == 0 #nu poate captura vertical
+            
+            if (startX == finishX) and (finishY - startY) == 1: # 1 square down vertically
+                return finish_value == 0
+            
+            if ( abs(startX - finishX) == 1 ) and ( (finishY - startY) == 1 ) :
+                #print("here")
+                return canTake(start_value, finish_value)
+
+        case cs.P:
+            if (startX == finishX) and (finishY == 4) and (startY == 6): 
+                return finish_value == 0
+            
+            if (startX == finishX) and (startY - finishY)  == 1: # 1 square up vertically
+                return finish_value == 0
+            
+            if ( abs(startX - finishX) )== 1 and ( (finishY - startY) == -1 ) :
+                #print("here")
+                return canTake(start_value, finish_value)
         
-        
-        case _: pass 
-    
+        case cs.n | cs.N:
 
 
-    
+            return ( abs(startX-finishX) + abs(startY-finishY) ) == 3 and ( abs(startX-finishX) <= 2 ) and \
+            ( abs(startY-finishY) <= 2 )
+                
+        case cs.b | cs.B:
+            if abs(startX-finishX) == abs(startY-finishY):
+                #momentan poate sari peste piese
+                return blocked(start, finish)
+                pass
 
-    
+        case cs.r | cs.R:
+            if startX == finishX or startY == finishY:
+                #momentan poate sari peste piese
+                return blocked(start, finish)        
+                pass
 
+        case cs.q | cs.Q:
+            if startX == finishX or startY == finishY or ( abs(startX-finishX) == abs(startY-finishY) ):
+                #momentan poate sari peste piese
+                return blocked(start, finish)
+                pass
 
+        case cs.k | cs.K: #done
+            return ( abs(startX-finishX) <= 1 ) and ( abs(startY-finishY) <= 1 )   
             
 
+        
+        case _: return True 
+    
+def sign(x):
+    if x > 0:
+        return 1
+    if x < 0:
+        return -1
+    else:
+        return 0
+
+def blocked(start, finish):
+
+    startX , startY = start[1] , start[0]
+    finishX , finishY = finish[1] , finish[0]
+
+    # am 4 directii pe care pot sa avansez: Ox, Oy, si 2 bisectoare
+    
+    dx = sign(finishX -startX)
+    dy = sign(finishY - startY)
+    print(f"dx: {dx}")
+    print(f"dy: {dy}")
+    i = dx, dy
+
+    # e suficient sa verific pana la finish -1
+
+    while (startX != finishX -dx) or (startY != finishY -dy):
+
+        startX = startX + dx
+        startY = startY + dy
+        print(pieces[startY][startX])
+
+        if pieces[startY][startX]:
+            return False
+    
+    return True
+        
 
 # Main loop
 def main():
@@ -270,6 +368,7 @@ def main():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
+                    print(" ")
                     activeSquare = mouse_square(event.pos)
                     if pieces[activeSquare]:
                         highlightBool = True
@@ -285,6 +384,7 @@ def main():
             move(activeSquare)
         draw_pieces()
         
+        
         pygame.display.flip()
 
 main()
@@ -292,10 +392,4 @@ main()
 # Quit pygame
 pygame.quit()
 
-#ai facut functie de verificat culoarea, implementeaza in move() sa verifice
-#daca piesa pe care o ia este de alta culoare
-#adik pe scurt mai bn te apuci sa faci o functie legalMove() 
-#bafta
-
-
-#nu merge coaie isWhite()... vezi cf
+#TODO line 236
