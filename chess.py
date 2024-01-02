@@ -23,22 +23,16 @@ WHITE = (255, 255, 255)
 BLACK =(0, 0, 0)
 PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
-LIGHT_BROWN = (209, 159, 108)
 
 highlightBool = False
 activeSquare = 0
 
-#swap
-AUX=WHITE
-WHITE=LIGHT_BROWN
-LIGHT_BROWN=AUX
 
-'''
 #swap
 AUX=PINK
 PINK=BROWN
 BROWN=AUX
-'''
+
 SIZE = 800
 
 # Font
@@ -99,118 +93,76 @@ def draw_board():
             square_color = WHITE if (row + col) % 2 == 0 else BROWN
             pygame.draw.rect(screen, square_color, (col * square_size, row * square_size, square_size, square_size))
 
-#Load image for each piece
-w_p_img_original = pygame.image.load('img/w_pawn.png')
-w_r_img_original = pygame.image.load('img/w_rook.png')
-w_b_img_original = pygame.image.load('img/w_bishop.png')
-w_n_img_original = pygame.image.load('img/w_knight.png')
-w_q_img_original = pygame.image.load('img/w_queen.png')
-w_k_img_original = pygame.image.load('img/w_king.png')
-
-b_p_img_original = pygame.image.load('img/b_pawn.png')
-b_r_img_original = pygame.image.load('img/b_rook.png')
-b_b_img_original = pygame.image.load('img/b_bishop.png')
-b_n_img_original = pygame.image.load('img/b_knight.png')
-b_q_img_original = pygame.image.load('img/b_queen.png')
-b_k_img_original = pygame.image.load('img/b_king.png')
-
-#Resize images
-new_width = 100
-new_height = 100
-
-w_p_img = pygame.transform.scale(w_p_img_original, (new_width, new_height))
-w_r_img = pygame.transform.scale(w_r_img_original, (new_width, new_height))
-w_b_img = pygame.transform.scale(w_b_img_original, (new_width, new_height))
-w_n_img = pygame.transform.scale(w_n_img_original, (new_width, new_height))
-w_q_img = pygame.transform.scale(w_q_img_original, (new_width, new_height))
-w_k_img = pygame.transform.scale(w_k_img_original, (new_width, new_height))
-
-b_p_img = pygame.transform.scale(b_p_img_original, (new_width, new_height))
-b_r_img = pygame.transform.scale(b_r_img_original, (new_width, new_height))
-b_b_img = pygame.transform.scale(b_b_img_original, (new_width, new_height))
-b_n_img = pygame.transform.scale(b_n_img_original, (new_width, new_height))
-b_q_img = pygame.transform.scale(b_q_img_original, (new_width, new_height))
-b_k_img = pygame.transform.scale(b_k_img_original, (new_width, new_height))
 
 # Draw the pieces using 'pieces' array
 def draw_pieces():
+    
     for i in range(8):
             for j in range (8):
                 match(pieces[i][j]):
                     case cs.p: #p
-                        text = w_p_img
-                        #text = font.render('p', True , PINK)
+                        text = font.render('p', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.P: #P
-                        text = b_p_img
-                        #text = font.render('P', True , PINK)
+                        text = font.render('P', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.r: #r
-                        text = w_r_img
-                        #text = font.render('r', True , PINK)
+                        text = font.render('r', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.R: #R
-                        text = b_r_img
-                        #text = font.render('R', True , PINK)
+                        text = font.render('R', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.n: #n
-                        text = w_n_img
-                        #text = font.render('n', True , PINK)
+                        text = font.render('n', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.N: #N
-                        text = b_n_img
-                        #text = font.render('N', True , PINK)
+                        text = font.render('N', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.b: #b
-                        text = w_b_img
-                        #text = font.render('b', True , PINK)
+                        text = font.render('b', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.B: #B
-                        text = b_b_img
-                        #text = font.render('B', True , PINK)
+                        text = font.render('B', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.q: #q
-                        text = w_q_img
-                        #text = font.render('q', True , PINK)
+                        text = font.render('q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.Q: #Q
-                        text = b_q_img
-                        #text = font.render('Q', True , PINK)
+                        text = font.render('Q', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.k: #k
-                        text = w_k_img
-                        #text = font.render('k', True , PINK)
+                        text = font.render('k', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)
                     case cs.K: #K
-                        text = b_k_img
-                        #text = font.render('K', True , PINK)
+                        text = font.render('K', True , PINK)
                         textRect = text.get_rect()
                         textRect.center = ((j+0.5) * square_size , (i+0.5) * square_size)
                         screen.blit(text, textRect)                    
                     case _:
                         pass
+    
     
 # Mouse position -> board square
 def mouse_square(x):
