@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import time
 # from .header import *
 
 # chess pieces # White , Black
@@ -24,6 +25,7 @@ BLACK =(0, 0, 0)
 PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
 LIGHT_BROWN = (209, 159, 108)
+COLOUR = (209, 178, 146)
 
 highlightBool = False
 activeSquare = 0
@@ -33,25 +35,30 @@ AUX=WHITE
 WHITE=LIGHT_BROWN
 LIGHT_BROWN=AUX
 
-'''
-#swap
-AUX=PINK
-PINK=BROWN
-BROWN=AUX
-
-'''
 SIZE = 800
+PANEL_WIDTH = 400
 
 # Font
 font = pygame.font.SysFont('arial',25)
 
 # Set up the display
-screen_size = (SIZE, SIZE)
+screen_size = (SIZE + PANEL_WIDTH, SIZE)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('Chess')
+screen.fill(COLOUR)
+
+# clock
+clock = pygame.time.Clock()
+clock_surface = pygame.Surface((200, 100))
+clock_surface.fill(WHITE)
+clock_font = pygame.font.SysFont('arial', 36)
+# var. for clock
+start_time = 0
+elapsed_time = 0
+format_time = "00:00:00"
 
 # Define the size of each square
-square_size = screen_size[0] // 8
+square_size = SIZE // 8
 
 #('a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h') 
 FILES = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Vertical lines
@@ -212,7 +219,7 @@ def draw_pieces():
                         screen.blit(text, textRect)                    
                     case _:
                         pass
-    
+
 # Mouse position -> board square
 def mouse_square(x):
     j = x[0] // square_size
@@ -406,10 +413,15 @@ def blocked(start, finish):
 def main():
     global highlightBool
     global activeSquare
+    global start_time
+    global elapsed_time
+    global format_time
+
+    game_started = False #when true => timer starts
 
     set_start()
     running = True
-
+    start_time = time.time()
     
     while running:
         for event in pygame.event.get():
@@ -421,18 +433,33 @@ def main():
                     activeSquare = mouse_square(event.pos)
                     if pieces[activeSquare]:
                         highlightBool = True
+                        if game_started == False:
+                            start_time = time.time()
+                            game_started = True
                 else: highlightBool = False
-
-                    
-
-                
         
+        if game_started == True:
+            elapsed_time = time.time() - start_time #calcul timp
+            format_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+
+
         draw_board() 
         if highlightBool:
             highlight(activeSquare)  
             move(activeSquare)
         draw_pieces()
-        
+
+        #updating the clock display:
+            # render + blit + center
+        text_clock = clock_font.render(format_time, True, BLACK)
+        text_clock_rect = text_clock.get_rect(center=clock_surface.get_rect().center)
+        clock_surface.fill(WHITE)
+        clock_surface.blit(text_clock, text_clock_rect)
+
+        # render the clock onto display
+        position_x = 900
+        position_y = 600
+        screen.blit(clock_surface, (position_x, position_y))
         
         pygame.display.flip()
 
