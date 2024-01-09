@@ -1,6 +1,5 @@
 import pygame
 import numpy as np
-import time
 
 # chess pieces # White , Black
 
@@ -18,78 +17,69 @@ pygame.init()
 # Define parameters
 WHITE = (255, 255, 255)
 BLACK =(0, 0, 0)
+PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
-LIGHT_BROWN = (209, 159, 108)
-COLOUR = (209, 178, 146)
 
 highlightBool = False
 activeSquare = 0
 activePlayer = True # true = white
-move_counter = 0 #counter for number of moves (no capture is made/ no pawn is moved)
 
 
 SIZE = 800
-PANEL_WIDTH = 400
 
 # Font
 font = pygame.font.SysFont('arial',25)
 
 # Set up the display
-screen_size = (SIZE + PANEL_WIDTH, SIZE)
+screen_size = (SIZE, SIZE)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('Chess')
-screen.fill(COLOUR)
-
-# clock
-clock = pygame.time.Clock()
-clock_surface = pygame.Surface((200, 100))
-clock_surface.fill(WHITE)
-clock_font = pygame.font.SysFont('arial', 36)
-
-# var. for clock
-start_time = 0
-elapsed_time = 0
-format_time = "00:00:00"
 
 # Define the size of each square
-square_size = SIZE // 8
+square_size = screen_size[0] // 8
 
 #('a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h') 
 FILES = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Vertical lines
 RANKS = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Horizontal lines
 
 # Array to store piece positions
-pieces = np.array([[0]*8]*8)
-copy = np.array([[0]*8]*8) 
+pieces = np.array([[0]*8]*8) 
+copy = np.array([[0]*8]*8)
 
 # Set starting postion for pieces 
 def set_start():
-        for i in range(8):
-            for j in range(8):
-                match (i,j):
-                    case (1,j):
-                        pieces[i][j] = cs.p
-                    case (6,j):
-                        pieces[i][j] = cs.P
-                    case _:
-                        pieces[i][j] = 0
-        pieces[0][0]= cs.r
-        pieces[0][1]= cs.n
-        pieces[0][2]= cs.b
-        pieces[0][3]= cs.q
-        pieces[0][4]= cs.k
-        pieces[0][5]= cs.b
-        pieces[0][6]= cs.n
-        pieces[0][7]= cs.r
+        
+    for i in range(8):
+        for j in range(8):
+            match (i,j):
+                case (1,j):
+                    pieces[i][j] = cs.p
+                case (6,j):
+                    pieces[i][j] = cs.P
+                case _:
+                    pieces[i][j] = 0
+    pieces[0][0]= cs.r
+    pieces[0][1]= cs.n
+    pieces[0][2]= cs.b
+    pieces[0][3]= cs.q
+    pieces[0][4]= cs.k
+    pieces[0][5]= cs.b
+    pieces[0][6]= cs.n
+    pieces[0][7]= cs.r
 
-        pieces[7][0]= cs.R
-        pieces[7][1]= cs.N
-        pieces[7][2]= cs.B
-        pieces[7][3]= cs.Q
-        pieces[7][4]= cs.K
-        pieces[7][5]= cs.B
-        pieces[7][6]= cs.N
-        pieces[7][7]= cs.R
+    pieces[7][0]= cs.R
+    pieces[7][1]= cs.N
+    pieces[7][2]= cs.B
+    pieces[7][3]= cs.Q
+    pieces[7][4]= cs.K
+    pieces[7][5]= cs.B
+    pieces[7][6]= cs.N
+    pieces[7][7]= cs.R
+
+    global whiteKing 
+    whiteKing = [7,4]
+    global blackKing 
+    blackKing = [0,4]
 
    
 
@@ -187,49 +177,18 @@ def move(activeSq):
                 takeSquare = mouse_square(event.pos)
                 move = activeSq , takeSquare
                 if legal(*move, pieces) and not willCheck(*move):
-                    #check if piece is captured
-                    captured = is_captured(activeSq, takeSquare, pieces)
-
-                    #board update
                     pieces[takeSquare] = pieces[activeSq]
                     pieces[activeSq] = 0
                     
-                    #promotion of pawn check
-                    check_promotion(takeSquare, pieces) 
-
-                    #updating the counter -for 50 move rule
-                    if captured or pieces[takeSquare] in [cs.P, cs.p]:
-                        move_counter = 0 #resets if pawn moved or piece captured
-                    else:
-                        move_counter += 1 #increments counter
-
                     activePlayer = not activePlayer
-                highlightBool = False
+                    highlightBool = False
+                    checkmate(activePlayer, pieces)
+
 
             if event.button == 3:
                 highlightBool = False
     
 
-
-#verifies if piece was captured
-def is_captured(start_position, end_position, board):
-    start_piece = board[start_position[0]][start_position[1]] 
-    end_piece = board[end_position[0]][end_position[1]]
-    if end_piece!=0 : #empty square is represented by 0
-        if (start_piece > 10 and end_piece in range(1, 10)) or (end_piece > 10 and start_piece in range(1, 10)): #verific ca piesele sunt de culori diferite
-            return True #captured
-        
-    return False #not captured
-
-#verifies if piece was captured
-def is_captured(start_position, end_position, board):
-    start_piece = board[start_position[0]][start_position[1]] 
-    end_piece = board[end_position[0]][end_position[1]]
-    if end_piece!=0 : #empty square is represented by 0
-        if (start_piece > 10 and end_piece in range(1, 10)) or (end_piece > 10 and start_piece in range(1, 10)): #verific ca piesele sunt de culori diferite
-            return True #captured
-        
-    return False #not captured
 
 def colour(pieceValue):
     if pieceValue in range(1,10):
@@ -250,7 +209,7 @@ def canTake(attackValue , defendValue):
     return ( colour(attackValue) == "White" ) and ( colour(defendValue)  == "Black" ) or \
            ( colour(attackValue) == "Black" ) and ( colour(defendValue)  == "White" )
 
-def legal(start , finish): # start, finish = pieces (i , j)
+def legal(start , finish, board): # start, finish = pieces (i , j)
     #start, finish = board(y, x)
     #print(f"start: {start}")
     #print(f"finish: {finish}")
@@ -270,6 +229,8 @@ def legal(start , finish): # start, finish = pieces (i , j)
     startX , startY = start[1] , start[0]
     finishX , finishY = finish[1] , finish[0]
     
+    
+
     match(start_value):
     #implementeaza cazuri pt piese    
         
@@ -319,8 +280,7 @@ def legal(start , finish): # start, finish = pieces (i , j)
 
         case cs.k | cs.K: #done
             return ( abs(startX-finishX) <= 1 ) and ( abs(startY-finishY) <= 1 )   
- 
-        case _: return False 
+            
 
         
         case _: return False 
@@ -548,13 +508,9 @@ def mate(whitesTurn, board):
 def main():
     global highlightBool
     global activeSquare
-    global start_time, elapsed_time, format_time
     global activePlayer
-    global move_counter, start_pos, finish_pos
-
-    game_started = False #when true => timer starts
-    game_ended = False #when true => timer stops
-
+    clock = pygame.time.Clock()
+    FPS = 30
     set_start()
     
     pygame.event.set_blocked(pygame.MOUSEMOTION)
@@ -565,10 +521,6 @@ def main():
 
     images = load_images()
 
-    
-    images = load_images()
-    start_time = time.time()
- 
     running = True
     while running:
         for event in pygame.event.get():
@@ -581,46 +533,22 @@ def main():
                     #print(turn( pieces[activeSquare], activePlayer ))
                     if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
-                        #clock:
-                        if game_started == False:
-                            start_time = time.time()
-                            game_started = True
+                    else:
+                        highlightBool = False
+                
+                else: highlightBool = False
 
-                    else: highlightBool = False
+                    
+
+                
         
-        #clock:
-        if game_started == True:
-            elapsed_time = time.time() - start_time #calcul timp
-            format_time = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
-
-
-        draw_board() 
+        draw_board()
+        #checkmate(activePlayer, pieces) 
         if highlightBool:
             highlight(activeSquare)  
             move(activeSquare)
         draw_pieces(images)
-
-        #updating the clock display:
-            # render + blit + center
-        text_clock = clock_font.render(format_time, True, BLACK)
-        text_clock_rect = text_clock.get_rect(center=clock_surface.get_rect().center)
-        clock_surface.fill(WHITE)
-        clock_surface.blit(text_clock, text_clock_rect)
-
-            # render the clock onto display
-        position_x = 900
-        position_y = 600
-        screen.blit(clock_surface, (position_x, position_y))
         
-        #timer stops + game stops at 50 moves - 50 per player
-        if move_counter == 100:
-            running = False
-            game_ended = True
-            print("Draw (50-move rule)")
-
-        #clock:
-        if game_ended:
-            game_started = False
 
         pygame.display.flip()
         #clock.tick(FPS)
