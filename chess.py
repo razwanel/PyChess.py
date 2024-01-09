@@ -181,7 +181,7 @@ def move(activeSq):
                     pieces[activeSq] = 0
                     
                     activePlayer = not activePlayer
-                highlightBool = False
+                    highlightBool = False
 
             if event.button == 3:
                 highlightBool = False
@@ -192,10 +192,10 @@ def colour(pieceValue):
     if pieceValue in range(1,10):
         #print("colour: White")
         return "White"
-    if pieceValue > 10 :
+    elif pieceValue > 10 :
         #print("colour: Black")
         return "Black"
-    if pieceValue == 0 :
+    elif pieceValue == 0 :
         #print("colour: Empty")
         return "Empty"
     
@@ -318,15 +318,22 @@ def blocked(start, finish, board):
 
 # Verifica daca piesa selectata este a jucatorului care trebuie sa mute:
 
-def turn(selectedValue):
-    whitesTurn = colour( selectedValue ) == 'White'
+def turn(selectedValue, whitesMove):
+    selectedColour = colour( selectedValue )
+    
+    if selectedColour == 'Empty':
+        return False
+    
+    whitesTurn = selectedColour == 'White'
     #blacksTurn = colour( selectedValue ) == 'Black'
-    global activePlayer
+    
+    
 
-    if whitesTurn == activePlayer:
+    if whitesTurn == whitesMove:
         
        # activePlayer = not activePlayer
         return True
+    
     
     return False
     
@@ -458,8 +465,11 @@ def main():
                 if event.button == 1:
                     print(" ")
                     activeSquare = mouse_square(event.pos)
-                    if turn( pieces[activeSquare] ):
+                    print(turn( pieces[activeSquare], activePlayer ))
+                    if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
+                    else:
+                        highlightBool = False
                 
                 else: highlightBool = False
 
