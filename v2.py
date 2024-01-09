@@ -166,25 +166,31 @@ def move(activeSq):
     global activePlayer
     #inCheck(activePlayer, pieces)
     #checkmate(activePlayer, pieces)
+    print('se apeleaza move')
+    #mate(activePlayer, pieces)
+        
+    event = pygame.event.wait()
     
-    if pieces[activeSq]:
-        
-        event = pygame.event.wait()
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            
-            if event.button == 1:
-                takeSquare = mouse_square(event.pos)
-                move = activeSq , takeSquare
-                if legal(*move, pieces) and not willCheck(*move):
-                    pieces[takeSquare] = pieces[activeSq]
-                    pieces[activeSq] = 0
-                    
-                    activePlayer = not activePlayer
-                    highlightBool = False
+    # while event != pygame.MOUSEBUTTONDOWN:
+    #     event = pygame.event.wait()
 
-            if event.button == 3:
+    if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.button == 1: #left-click
+            takeSquare = mouse_square(event.pos)
+            move = activeSq , takeSquare
+            if legal(*move, pieces) and not willCheck(*move):
+                pieces[takeSquare] = pieces[activeSq]
+                pieces[activeSq] = 0
+                
+                activePlayer = not activePlayer
                 highlightBool = False
+
+        if event.button == 3: #left-click
+
+            highlightBool = False
+    
+
+
 
 
 def colour(pieceValue):
@@ -399,7 +405,6 @@ def willCheck(start, finish):
     #TODO: stalemate checkmate, castling, 50 move rule
         
 def checkmate(whitesTurn, board):
-    aux = whitesTurn
     
     possibleMoves = set()
     stringTurn = 'White' if whitesTurn else 'Black'
@@ -426,20 +431,82 @@ def checkmate(whitesTurn, board):
     
     return None
 
-def checkmate2(whiteToMove, board):
-    pass
+def checks(currPlayer, board, move):
+
+    start = move[0]
+    finish = move[1]
     
-def iterateMoves(whiteToMove, board):
+    opponentMoves = set()
     possibleMoves = set()
-    seenMoves = set()
+
+
+
+def findKing(side, board):
+    # side = True for white / False for black
+    king = cs.K if side else cs.k
+    for i in range(8):
+        for j in range(8):
+
+            if board[i][j] == king:
+                
+                return i,j
+            #(row, col) for king
+
+
+def Check(whitesTurn, board): 
+
+    kingPos = findKing(whitesTurn, board)
+    
+    for i in range(8):
+        for j in range(8):
+
+            if legal( (i,j) , kingPos , board ):
+                return True
+    return False
+
+
+def futureCheck(whiteToMove, start, finish):
+    global pieces
+
+    copy = np.copy(pieces)
+    copy[finish] = copy[start]
+    copy[start] = 0
+
+    print(copy)
+
+    if Check(whiteToMove, copy):
+        print('willcheck True')
+        return True
+    else:
+        print('willCheck False')
+        return False
+
+def mate(whitesTurn, board):
+    
+    possibleMoves = set()
+    stringTurn = 'White' if whitesTurn else 'Black'
 
     for i in range(8):
         for j in range(8):
-            for r in range(8):
-                for c in range(8):
-                    move = ((i,j), (r,c))
+            
+            if board[i][j] != 0:
+            
+                for r in range(8):
+                    for c in range(8):
+                        move = ((i,j), (r,c))
 
-
+                        if legal(*move, board) and not futureCheck(whitesTurn, *move): 
+                            possibleMoves.add(move)
+    
+    if len(possibleMoves) == 0:
+        if Check(whitesTurn, board):
+            print(stringTurn + 'is checkmated')
+            return ('mate')
+        else:
+            print(stringTurn + ': stalemate')
+            return ('stalemate')
+    
+    return None
 
 
 
@@ -455,6 +522,7 @@ def main():
     set_start()
     
     images = load_images()
+    pygame.event.set_blocked(pygame.MOUSEMOTION)
 
     running = True
     while running:
@@ -465,7 +533,9 @@ def main():
                 if event.button == 1:
                     print(" ")
                     activeSquare = mouse_square(event.pos)
-                    print(turn( pieces[activeSquare], activePlayer ))
+
+                    #print(turn( pieces[activeSquare], activePlayer ))
+                    mate(activePlayer, pieces)
                     if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
                     else:
@@ -481,6 +551,7 @@ def main():
         #checkmate(activePlayer, pieces) 
         if highlightBool:
             highlight(activeSquare)  
+            #pygame.display.flip()
             move(activeSquare)
         draw_pieces(images)
         
