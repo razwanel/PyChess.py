@@ -99,18 +99,18 @@ image_dict = {}
 def load_images():
 
     image_dict = {
-    'p': pygame.image.load('images/'+ 'bP' + '.png'),
-    'r': pygame.image.load('images/'+ 'bR' + '.png'),
-    'n': pygame.image.load('images/'+ 'bN' + '.png'),
-    'b': pygame.image.load('images/'+ 'bB' + '.png'),
-    'q': pygame.image.load('images/'+ 'bQ' + '.png'),
-    'k': pygame.image.load('images/'+ 'bK' + '.png'),
-    'P': pygame.image.load('images/'+ 'wP' + '.png'),
-    'R': pygame.image.load('images/'+ 'wR' + '.png'),
-    'N': pygame.image.load('images/'+ 'wN' + '.png'),
-    'B': pygame.image.load('images/'+ 'wB' + '.png'),
-    'Q': pygame.image.load('images/'+ 'wQ' + '.png'),
-    'K': pygame.image.load('images/'+ 'wK' + '.png'),
+    'p': pygame.transform.scale(pygame.image.load('images/' + 'bP' + '.png'), (square_size, square_size)),
+    'r': pygame.transform.scale(pygame.image.load('images/' + 'bR' + '.png'), (square_size, square_size)),
+    'n': pygame.transform.scale(pygame.image.load('images/' + 'bN' + '.png'), (square_size, square_size)),
+    'b': pygame.transform.scale(pygame.image.load('images/' + 'bB' + '.png'), (square_size, square_size)),
+    'q': pygame.transform.scale(pygame.image.load('images/' + 'bQ' + '.png'), (square_size, square_size)),
+    'k': pygame.transform.scale(pygame.image.load('images/' + 'bK' + '.png'), (square_size, square_size)),
+    'P': pygame.transform.scale(pygame.image.load('images/' + 'wP' + '.png'), (square_size, square_size)),
+    'R': pygame.transform.scale(pygame.image.load('images/' + 'wR' + '.png'), (square_size, square_size)),
+    'N': pygame.transform.scale(pygame.image.load('images/' + 'wN' + '.png'), (square_size, square_size)),
+    'B': pygame.transform.scale(pygame.image.load('images/' + 'wB' + '.png'), (square_size, square_size)),
+    'Q': pygame.transform.scale(pygame.image.load('images/' + 'wQ' + '.png'), (square_size, square_size)),
+    'K': pygame.transform.scale(pygame.image.load('images/' + 'wK' + '.png'), (square_size, square_size)),
 }
     return image_dict
 
