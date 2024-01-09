@@ -184,6 +184,7 @@ def move(activeSq):
                 
                 activePlayer = not activePlayer
                 highlightBool = False
+                mate(activePlayer, pieces)
 
         if event.button == 3: #left-click
 
@@ -219,6 +220,7 @@ def legal(start , finish, board): # start, finish = pieces (i , j)
     #print(f"finish: {finish}")
     start_value = board[start] 
     finish_value = board[finish]
+    #print(f'FINISH VALUE {finish_value}')
     #print(f"Start value:{start_value}")
     #print(f"Finish value:{finish_value}")
     
@@ -396,10 +398,10 @@ def willCheck(start, finish):
     player = True if (copy[finish] < 10) else False
 
     if inCheck(activePlayer, copy):
-        print('willcheck True')
+        #print('willcheck True')
         return True
     else:
-        print('willCheck False')
+        #print('willCheck False')
         return False
 
     #TODO: stalemate checkmate, castling, 50 move rule
@@ -431,14 +433,6 @@ def checkmate(whitesTurn, board):
     
     return None
 
-def checks(currPlayer, board, move):
-
-    start = move[0]
-    finish = move[1]
-    
-    opponentMoves = set()
-    possibleMoves = set()
-
 
 
 def findKing(side, board):
@@ -448,15 +442,18 @@ def findKing(side, board):
         for j in range(8):
 
             if board[i][j] == king:
-                
-                return i,j
+                res = (i,j)
+                return res
             #(row, col) for king
+    return None
 
 
 def Check(whitesTurn, board): 
 
     kingPos = findKing(whitesTurn, board)
-    
+    # if kingPos == None:
+    #     return True
+
     for i in range(8):
         for j in range(8):
 
@@ -498,6 +495,7 @@ def mate(whitesTurn, board):
                         if legal(*move, board) and not futureCheck(whitesTurn, *move): 
                             possibleMoves.add(move)
     
+    #print(f'len: {len(possibleMoves)}')
     if len(possibleMoves) == 0:
         if Check(whitesTurn, board):
             print(stringTurn + 'is checkmated')
@@ -505,8 +503,9 @@ def mate(whitesTurn, board):
         else:
             print(stringTurn + ': stalemate')
             return ('stalemate')
-    
-    return None
+    else:
+        print(f'Moves: {possibleMoves}')    
+
 
 
 
@@ -522,7 +521,12 @@ def main():
     set_start()
     
     images = load_images()
+    
     pygame.event.set_blocked(pygame.MOUSEMOTION)
+    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+    pygame.event.set_blocked(pygame.MOUSEBUTTONUP)
+
+    pygame.event.set_allowed([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP])
 
     running = True
     while running:
@@ -535,7 +539,7 @@ def main():
                     activeSquare = mouse_square(event.pos)
 
                     #print(turn( pieces[activeSquare], activePlayer ))
-                    mate(activePlayer, pieces)
+                    #mate(activePlayer, pieces)
                     if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
                     else:

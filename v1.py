@@ -165,7 +165,7 @@ def move(activeSq):
     global highlightBool
     global activePlayer
     #inCheck(activePlayer, pieces)
-    checkmate(activePlayer, pieces)
+    #checkmate(activePlayer, pieces)
     #mate(activePlayer, pieces)
     if pieces[activeSq]:
         
@@ -182,13 +182,15 @@ def move(activeSq):
                     
                     activePlayer = not activePlayer
                     highlightBool = False
+                    checkmate(activePlayer, pieces)
+
 
             if event.button == 3:
                 highlightBool = False
+    
 
 
 def colour(pieceValue):
-
     if pieceValue in range(1,10):
         #print("colour: White")
         return "White"
@@ -341,7 +343,7 @@ def turn(selectedValue, whitesMove):
 def inCheck(whitesTurn, board): 
     seenSquares = set()    
     literalTurn = 'Black' if whitesTurn else 'White'
-    print(f'{whitesTurn} , {literalTurn}')
+    #print(f'{whitesTurn} , {literalTurn}')
     #check every possible move for enemy player
 
     for i in range(8):
@@ -365,11 +367,11 @@ def inCheck(whitesTurn, board):
     for square in seenSquares:
         
         if board[square] == cs.K:
-            print(f'White in check from {square}')
+            #print(f'White in check from {square}')
             return True
     
         if board[square] == cs.k:
-            print(f'Black in check from {square}')
+            #print(f'Black in check from {square}')
             return True
 
     return False    
@@ -390,10 +392,10 @@ def willCheck(start, finish):
     player = True if (copy[finish] < 10) else False
 
     if inCheck(activePlayer, copy):
-        print('willcheck True')
+        #print('willcheck True')
         return True
     else:
-        print('willCheck False')
+        #print('willCheck False')
         return False
 
     #TODO: stalemate checkmate, castling, 50 move rule
@@ -418,10 +420,10 @@ def checkmate(whitesTurn, board):
     
     if len(possibleMoves) == 0:
         if inCheck(whitesTurn, board):
-            print(stringTurn + 'is checkmated')
+            print(stringTurn + ' is checkmated')
             return ('mate')
         else:
-            print(stringTurn + ': stalemate')
+            print('stalemate')
             return ('stalemate')
     
     return None
@@ -461,10 +463,10 @@ def futureCheck(whiteToMove, start, finish):
     print(copy)
     
     if Check(whiteToMove, copy):
-        print('willcheck True')
+        #print('willcheck True')
         return True
     else:
-        print('willCheck False')
+        #print('willCheck False')
         return False
 
 def mate(whitesTurn, board):
@@ -486,7 +488,7 @@ def mate(whitesTurn, board):
     
     if len(possibleMoves) == 0:
         if Check(whitesTurn, board):
-            print(stringTurn + 'is checkmated')
+            print(stringTurn + ' is checkmated')
             return ('mate')
         else:
             print(stringTurn + ': stalemate')
@@ -512,6 +514,10 @@ def main():
     set_start()
     
     pygame.event.set_blocked(pygame.MOUSEMOTION)
+    pygame.event.set_blocked(pygame.MOUSEBUTTONDOWN)
+    pygame.event.set_blocked(pygame.MOUSEBUTTONUP)
+
+    pygame.event.set_allowed([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP])
 
     images = load_images()
 
@@ -522,9 +528,9 @@ def main():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    print(" ")
+                    #print(" ")
                     activeSquare = mouse_square(event.pos)
-                    print(turn( pieces[activeSquare], activePlayer ))
+                    #print(turn( pieces[activeSquare], activePlayer ))
                     if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
                     else:
