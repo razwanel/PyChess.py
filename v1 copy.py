@@ -179,7 +179,9 @@ def move(activeSq):
                 if legal(*move, pieces) and not willCheck(*move):
                     pieces[takeSquare] = pieces[activeSq]
                     pieces[activeSq] = 0
-                    
+
+                    check_promotion(takeSquare, pieces) #verific daca se poate face promotie
+
                     activePlayer = not activePlayer
                     highlightBool = False
                     checkmate(activePlayer, pieces)
@@ -496,6 +498,20 @@ def mate(whitesTurn, board):
     
     return None
 
+#check for pawn promotion:
+def check_promotion(takeSquare, board): # takeSquare - (i , j) 
+    
+    position = takeSquare[0] 
+    print('checking for promotion')
+
+    #verific daca e pion alb + daca pozitia pionului este in rank
+    if board[takeSquare] == 11 and position == 7: #nu functioneaza cu cs.p, asa ca am pus valorile date in clasa, 1 si 11
+        print('promoting pawn to black queen')
+        board[takeSquare] = cs.q 
+
+    elif board[takeSquare] == 1 and position == 0:
+            print('promoting pawn to white queen')
+            board[takeSquare] = cs.Q
 
 
 
