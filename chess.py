@@ -164,7 +164,8 @@ def highlight(sq):                                  # P1  P2
 def move(activeSq):
     global highlightBool
     global activePlayer
-    inCheck(activePlayer, pieces)
+    #inCheck(activePlayer, pieces)
+    #checkmate(activePlayer, pieces)
     
     if pieces[activeSq]:
         
@@ -338,17 +339,20 @@ def inCheck(whitesTurn, board):
 
     for i in range(8):
         for j in range(8):
-            for r in range(8):
-                for c in range(8):
-                    if ( colour(board[i][j]) == literalTurn ) and legal( (i,j) , (r,c), board):
-                        # account for pawns not capturing in front of them
-                        if (board[i][j] == cs.p) or (board[i][j] == cs.P):
-                            if j != c:
+        
+            if board[i][j] != 0:
+          
+                for r in range(8):
+                    for c in range(8):
+                        if ( colour(board[i][j]) == literalTurn ) and legal( (i,j) , (r,c), board):
+                            # account for pawns not capturing in front of them
+                            if (board[i][j] == cs.p) or (board[i][j] == cs.P):
+                                if j != c:
+                                    seenSquares.add( (r,c) )
+                                    #print(f'{(j,i)} sees {(c,r)}')
+                            else:
                                 seenSquares.add( (r,c) )
-                                print(f'{(j,i)} sees {(c,r)}')
-                        else:
-                            seenSquares.add( (r,c) )
-                            print(f'{(j,i)} sees {(c,r)}')
+                                #print(f'{(j,i)} sees {(c,r)}')
     
     #print(sorted(seenSquares))
     for square in seenSquares:
@@ -387,12 +391,60 @@ def willCheck(start, finish):
 
     #TODO: stalemate checkmate, castling, 50 move rule
         
+def checkmate(whitesTurn, board):
+    aux = whitesTurn
+    
+    possibleMoves = set()
+    stringTurn = 'White' if whitesTurn else 'Black'
+
+    for i in range(8):
+        for j in range(8):
+            
+            if board[i][j] != 0:
+            
+                for r in range(8):
+                    for c in range(8):
+                        move = ((i,j), (r,c))
+
+                        if ( colour(board[i][j]) == stringTurn  ) and legal(*move, board) and not willCheck(*move):
+                            possibleMoves.add(move)
+    
+    if len(possibleMoves) == 0:
+        if inCheck(whitesTurn, board):
+            print(stringTurn + 'is checkmated')
+            return ('mate')
+        else:
+            print(stringTurn + ': stalemate')
+            return ('stalemate')
+    
+    return None
+
+def checkmate2(whiteToMove, board):
+    pass
+    
+def iterateMoves(whiteToMove, board):
+    possibleMoves = set()
+    seenMoves = set()
+
+    for i in range(8):
+        for j in range(8):
+            for r in range(8):
+                for c in range(8):
+                    move = ((i,j), (r,c))
+
+
+
+
+
+
 
 # Main loop
 def main():
     global highlightBool
     global activeSquare
     global activePlayer
+    clock = pygame.time.Clock()
+    FPS = 30
     set_start()
     
     images = load_images()
@@ -408,13 +460,15 @@ def main():
                     activeSquare = mouse_square(event.pos)
                     if turn( pieces[activeSquare] ):
                         highlightBool = True
+                
                 else: highlightBool = False
 
                     
 
                 
         
-        draw_board() 
+        draw_board()
+        #checkmate(activePlayer, pieces) 
         if highlightBool:
             highlight(activeSquare)  
             move(activeSquare)
@@ -422,6 +476,7 @@ def main():
         
 
         pygame.display.flip()
+        #clock.tick(FPS)
 
 if __name__ == "__main__":
     main()
