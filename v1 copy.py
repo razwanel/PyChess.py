@@ -35,6 +35,7 @@ font = pygame.font.SysFont('arial',25)
 # Set up the display
 screen_size = (SIZE + PANEL_WIDTH, SIZE)
 screen = pygame.display.set_mode(screen_size)
+screen.fill(WHITE)
 pygame.display.set_caption('Chess')
 
 # clocks
@@ -42,6 +43,19 @@ clock_font = pygame.font.SysFont('arial', 36)
 
 clock_surface_white = pygame.Surface((200, 100))
 clock_surface_black = pygame.Surface((200, 100))
+
+#panel for captured pieces
+white_captured_pieces_surface = pygame.Surface((240, 240))
+black_captured_pieces_surface = pygame.Surface((240, 240))
+contor_pozitii_ocupate_alb = 0
+contor_pozitii_ocupate_negru = 0
+
+#grid dimensions for captured pieces surface
+sq_size = 240 // 4
+
+#lists for captured pieces
+white_captured = []
+black_captured = []
 
 # var. for clock
 start_time_white = None
@@ -63,6 +77,16 @@ RANKS = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Horizontal lines
 # Array to store piece positions
 pieces = np.array([[0]*8]*8) 
 copy = np.array([[0]*8]*8)
+
+#array for positions in grid (of captured pieces surface)
+grid_white = np.array([[0]*4]*4)
+grid_black = np.array([[0]*4]*4)
+nr_of_sq = 0
+for i in range(4):
+    for j in range(4):
+            grid_white[i][j] = nr_of_sq
+            grid_black[i][j] = nr_of_sq
+            nr_of_sq += 1    
 
 # Set starting postion for pieces 
 def set_start():
@@ -544,11 +568,27 @@ def check_promotion(takeSquare, board): # takeSquare - (i , j)
 
 def is_captured(start_position, end_position, board):
     global activePlayer 
+    global contor_pozitii_ocupate_alb, contor_pozitii_ocupate_negru
+    global black_captured, white_captured
+
     start_piece = board[start_position[0]][start_position[1]] 
+    print('start_piece')
+    print(start_piece)
     end_piece = board[end_position[0]][end_position[1]]
+    print('end_piece')
+    print(end_piece)
     if end_piece!=0 : #empty square is represented by 0
-        if (start_piece > 10 and end_piece in range(1, 10)) or (end_piece > 10 and start_piece in range(1, 10)): #verific ca piesele sunt de culori diferite
+        if (start_piece > 10 and end_piece in range(1, 10)): #verific ca piesele sunt de culori diferite
+            white_captured.append(end_piece)
+            print(white_captured)
+            contor_pozitii_ocupate_alb += 1
             return True #captured
+        
+        elif (end_piece > 10 and start_piece in range(1, 10)):
+            black_captured.append(end_piece)
+            print(black_captured)
+            contor_pozitii_ocupate_negru += 1
+            return True
 
     return False #not captured
 
@@ -582,16 +622,91 @@ def draw_panel():
 
         #white player:
     white_position_x = 900
-    white_position_y = 650
+    white_position_y = 680
     screen.blit(clock_surface_white, (white_position_x, white_position_y))
 
         #black player:
     black_position_x = 900
-    black_position_y = 50
+    black_position_y = 25
     screen.blit(clock_surface_black, (black_position_x, black_position_y))
+
 #captured pieces:
+    #panel:  
+    white_captured_pieces_surface.fill(WHITE)
+    black_captured_pieces_surface.fill(WHITE)
+
+    
+    image11= pygame.transform.scale(pygame.image.load('images/' + 'bP' + '.png'), (sq_size, sq_size))
+    image50= pygame.transform.scale(pygame.image.load('images/' + 'bR' + '.png'), (sq_size, sq_size))
+    image30= pygame.transform.scale(pygame.image.load('images/' + 'bN' + '.png'), (sq_size, sq_size))
+    image40= pygame.transform.scale(pygame.image.load('images/' + 'bB' + '.png'), (sq_size, sq_size))
+    image90= pygame.transform.scale(pygame.image.load('images/' + 'bQ' + '.png'), (sq_size, sq_size))
+    image20= pygame.transform.scale(pygame.image.load('images/' + 'bK' + '.png'), (sq_size, sq_size))
+    image1= pygame.transform.scale(pygame.image.load('images/' + 'wP' + '.png'), (sq_size, sq_size))
+    image5= pygame.transform.scale(pygame.image.load('images/' + 'wR' + '.png'), (sq_size, sq_size))
+    image3= pygame.transform.scale(pygame.image.load('images/' + 'wN' + '.png'), (sq_size, sq_size))
+    image4= pygame.transform.scale(pygame.image.load('images/' + 'wB' + '.png'), (sq_size, sq_size))
+    image9= pygame.transform.scale(pygame.image.load('images/' + 'wQ' + '.png'), (sq_size, sq_size))
+    image2= pygame.transform.scale(pygame.image.load('images/' + 'wK' + '.png'), (sq_size, sq_size))
+ 
+
+    #blit to screen
+
+    contor_pozitii_ocupate_alb = len(white_captured)  # lungimea listei da numarul de piese capturate
+    contor_pozitii_ocupate_negru = len(black_captured)
+
+    for index in range(contor_pozitii_ocupate_alb):
+        i = index // 4 #get grid condition
+        j = index % 4 
+        value = white_captured[index]
+        match value:
+            case 1:
+                image_white = image1
+            case 5:
+                image_white = image5
+            case 4:
+                image_white = image4
+            case 3:
+                image_white = image3
+            case 2:
+                image_white = image2
+            case 9:
+                image_white = image9
+        
+        image_white_rect = image_white.get_rect()   
+        image_white_rect.center = ((j + 0.5) * sq_size, (i + 0.5) * sq_size)
+        white_captured_pieces_surface.blit(image_white, image_white_rect)
+
+    for index in range(contor_pozitii_ocupate_negru):
+        i = index // 4 #get grid position
+        j = index % 4  
+        value = black_captured[index]
+        match value:
+            case 11:
+                image_black = image11
+            case 50:
+                image_black = image50
+            case 40:
+                image_black = image40
+            case 30:
+                image_black = image30
+            case 90:
+                image_black = image90
+            case 20:
+                image_black = image20
+
+        image_black_rect = image_black.get_rect()
+        image_black_rect.center = ((j + 0.5) * sq_size, (i + 0.5) * sq_size)
+        black_captured_pieces_surface.blit(image_black, image_black_rect)
 
 
+    white_captured_position_x = 855
+    white_captured_position_y = 400
+    screen.blit(white_captured_pieces_surface, (white_captured_position_x, white_captured_position_y))
+
+    black_captured_position_x = 855
+    black_captured_position_y = 150
+    screen.blit(black_captured_pieces_surface, (black_captured_position_x, black_captured_position_y))
 
 def clocks_update():
     global start_time_black, start_time_white
@@ -615,7 +730,6 @@ def clocks_update():
         start_time_black = current_time
     else:
         start_time_black = None
-
 
 
 
