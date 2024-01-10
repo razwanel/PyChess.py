@@ -21,7 +21,7 @@ BLACK =(0, 0, 0)
 PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
 
-START_TIME = 15
+START_TIME = 10 * 60
 
 highlightBool = False
 activeSquare = 0
