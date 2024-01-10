@@ -23,7 +23,7 @@ BROWN = (58, 31 ,4)
 highlightBool = False
 activeSquare = 0
 activePlayer = True # true = white
-
+move_counter = 0 #counter for number of moves
 
 SIZE = 800
 
@@ -164,6 +164,7 @@ def highlight(sq):                                  # P1  P2
 def move(activeSq):
     global highlightBool
     global activePlayer
+    global move_counter
     #inCheck(activePlayer, pieces)
     #checkmate(activePlayer, pieces)
     #mate(activePlayer, pieces)
@@ -177,10 +178,19 @@ def move(activeSq):
                 takeSquare = mouse_square(event.pos)
                 move = activeSq , takeSquare
                 if legal(*move, pieces) and not willCheck(*move):
+                    #check if piece is captured
+                    captured = is_captured(activeSq, takeSquare, pieces)
+
                     pieces[takeSquare] = pieces[activeSq]
                     pieces[activeSq] = 0
 
                     check_promotion(takeSquare, pieces) #verific daca se poate face promotie
+
+                    #updating the counter
+                    if captured or pieces[takeSquare] in [cs.P, cs.p]:
+                        move_counter = 0 #resets if pawn moved or piece captured
+                    else:
+                        move_counter += 1 #increments counter
 
                     activePlayer = not activePlayer
                     highlightBool = False
@@ -514,6 +524,17 @@ def check_promotion(takeSquare, board): # takeSquare - (i , j)
             board[takeSquare] = cs.Q
 
 
+def is_captured(start_position, end_position, board):
+    global activePlayer 
+    start_piece = board[start_position[0]][start_position[1]] 
+    end_piece = board[end_position[0]][end_position[1]]
+    if end_piece!=0 : #empty square is represented by 0
+        if (start_piece > 10 and end_piece in range(1, 10)) or (end_piece > 10 and start_piece in range(1, 10)): #verific ca piesele sunt de culori diferite
+            return True #captured
+
+    return False #not captured
+
+
 
 
 
@@ -525,6 +546,7 @@ def main():
     global highlightBool
     global activeSquare
     global activePlayer
+    global move_counter
     clock = pygame.time.Clock()
     FPS = 30
     set_start()
@@ -565,6 +587,12 @@ def main():
             move(activeSquare)
         draw_pieces(images)
         
+
+        #timer stops + game stops at 50 moves - 50 per player
+        if move_counter == 100:
+            running = False
+            print("Draw (50-move rule)")
+
 
         pygame.display.flip()
         #clock.tick(FPS)
