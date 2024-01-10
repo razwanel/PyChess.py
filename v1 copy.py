@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import time
 
 # chess pieces # White , Black
 
@@ -26,17 +27,34 @@ activePlayer = True # true = white
 move_counter = 0 #counter for number of moves
 
 SIZE = 800
+PANEL_WIDTH = 400
 
 # Font
 font = pygame.font.SysFont('arial',25)
 
 # Set up the display
-screen_size = (SIZE, SIZE)
+screen_size = (SIZE + PANEL_WIDTH, SIZE)
 screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('Chess')
 
+# clocks
+clock_font = pygame.font.SysFont('arial', 36)
+
+clock_surface_white = pygame.Surface((200, 100))
+clock_surface_black = pygame.Surface((200, 100))
+
+# var. for clock
+start_time_white = None
+start_time_black = None
+
+white_time_played = 0
+black_time_played = 0
+
+running_w_clock = False
+running_b_clock = False
+
 # Define the size of each square
-square_size = screen_size[0] // 8
+square_size = SIZE // 8
 
 #('a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h') 
 FILES = (0 , 1 , 2 , 3 , 4 , 5 , 6 , 7)      # Vertical lines
@@ -534,6 +552,69 @@ def is_captured(start_position, end_position, board):
 
     return False #not captured
 
+#displaying clock + additional info
+def draw_panel():
+    global white_time_played, black_time_played
+
+  #convert seconds to string in format 00:00:00
+    w_time_format = time.strftime('%H:%M:%S', time.gmtime(white_time_played))
+    b_time_format = time.strftime('%H:%M:%S', time.gmtime(black_time_played))
+
+#clocks:
+    #updating the clock display:
+        # render + blit + center
+
+        # white player:
+    clock_surface_white.fill(WHITE)
+    text_clock_w = clock_font.render(w_time_format, True, BLACK) #clock for person that plays with white pieces
+    text_clock_rect = text_clock_w.get_rect(center=clock_surface_white.get_rect().center)
+    clock_surface_white.fill(WHITE)
+    clock_surface_white.blit(text_clock_w, text_clock_rect)
+
+        # black player
+    clock_surface_black.fill(WHITE)
+    text_clock_b = clock_font.render(b_time_format, True, BLACK) #clock for person that plays with white pieces
+    text_clock_rect = text_clock_b.get_rect(center=clock_surface_black.get_rect().center)
+    clock_surface_black.fill(WHITE)
+    clock_surface_black.blit(text_clock_b, text_clock_rect)
+
+    # render the clock onto display
+
+        #white player:
+    white_position_x = 900
+    white_position_y = 650
+    screen.blit(clock_surface_white, (white_position_x, white_position_y))
+
+        #black player:
+    black_position_x = 900
+    black_position_y = 50
+    screen.blit(clock_surface_black, (black_position_x, black_position_y))
+#captured pieces:
+
+
+
+def clocks_update():
+    global start_time_black, start_time_white
+    global running_b_clock, running_w_clock
+    global white_time_played, black_time_played
+
+    current_time = time.time()
+
+    if running_w_clock:
+        if start_time_white != None:
+            elapsed_time = current_time - start_time_white
+            white_time_played += elapsed_time
+        start_time_white = current_time
+    else:
+        start_time_white = None
+
+    if running_b_clock:
+        if start_time_black != None:
+            elapsed_time = current_time - start_time_black
+            black_time_played += elapsed_time
+        start_time_black = current_time
+    else:
+        start_time_black = None
 
 
 
@@ -547,6 +628,8 @@ def main():
     global activeSquare
     global activePlayer
     global move_counter
+    global start_time_black, start_time_white
+    global running_b_clock, running_w_clock
     clock = pygame.time.Clock()
     FPS = 30
     set_start()
@@ -558,7 +641,10 @@ def main():
     pygame.event.set_allowed([pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP])
 
     images = load_images()
-
+    
+    running_w_clock = True #white starts
+    running_b_clock = False
+    
     running = True
     while running:
         for event in pygame.event.get():
@@ -571,6 +657,14 @@ def main():
                     #print(turn( pieces[activeSquare], activePlayer ))
                     if turn( pieces[activeSquare], activePlayer ) :
                         highlightBool = True
+                        
+                        if highlightBool: 
+                            if activePlayer: #true = white
+                                running_b_clock = False
+                                running_w_clock = True
+                            else:
+                                running_w_clock = False
+                                running_b_clock = True
                     else:
                         highlightBool = False
                 
@@ -587,6 +681,9 @@ def main():
             move(activeSquare)
         draw_pieces(images)
         
+        clocks_update()
+
+        draw_panel()
 
         #timer stops + game stops at 50 moves - 50 per player
         if move_counter == 100:
