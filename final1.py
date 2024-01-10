@@ -27,12 +27,7 @@ highlightBool = False
 activeSquare = 0
 activePlayer = True # true = white
 move_counter = 0 #counter for number of moves
-
-leftCastleWhite = True
-rightCastleWhite = True
-
-leftCastleBlack = True
-rightCastleBlack = True
+loser = None
 
 SIZE = 800
 PANEL_WIDTH = 400
@@ -226,8 +221,6 @@ def move(activeSq):
                     pieces[takeSquare] = pieces[activeSq]
                     pieces[activeSq] = 0
 
-                    updateCastling(pieces)
-
                     check_promotion(takeSquare, pieces) #verific daca se poate face promotie
 
                     #updating the counter
@@ -248,13 +241,13 @@ def move(activeSq):
 
 def colour(pieceValue):
     if pieceValue in range(1,10):
-        #print("colour: White")
+
         return "White"
     elif pieceValue > 10 :
-        #print("colour: Black")
+
         return "Black"
     elif pieceValue == 0 :
-        #print("colour: Empty")
+
         return "Empty"
     
 def canTake(attackValue , defendValue):
@@ -267,13 +260,9 @@ def legal(start , finish, board): # start, finish = pieces (i , j)
     start_value = board[start] 
     finish_value = board[finish]
     
-    castling = Castle(start, finish, board)
-
-    print(castling)
-
     same_colour = colour(start_value) == colour(finish_value)   
     
-    if same_colour and not castling: 
+    if same_colour: 
         return False
     
     if start == finish:
@@ -332,12 +321,8 @@ def legal(start , finish, board): # start, finish = pieces (i , j)
                 pass
 
         case cs.k | cs.K: #done
-            if ( abs(startX-finishX) <= 1 ) and ( abs(startY-finishY) <= 1 ):
-                return True   
-            #castling
-            if castling:
-                print('castled')
-                return True
+            return ( abs(startX-finishX) <= 1 ) and ( abs(startY-finishY) <= 1 )   
+            
 
         
         case _: return False 
@@ -444,7 +429,7 @@ def willCheck(start, finish):
         return False
         
 def checkmate(whitesTurn, board):
-    
+    global loser
     possibleMoves = set()
     stringTurn = 'White' if whitesTurn else 'Black'
 
@@ -463,8 +448,10 @@ def checkmate(whitesTurn, board):
     if len(possibleMoves) == 0:
         if inCheck(whitesTurn, board):
             print(stringTurn + ' is checkmated')
+            loser = stringTurn
             return ('mate')
         else:
+            loser = 'stalemate'
             print('stalemate')
             return ('stalemate')
     
@@ -501,14 +488,12 @@ def futureCheck(whiteToMove, start, finish):
     copy = np.copy(pieces)
     copy[finish] = copy[start]
     copy[start] = 0
-
-    print(copy)
     
     if Check(whiteToMove, copy):
-        #print('willcheck True')
+
         return True
     else:
-        #print('willCheck False')
+
         return False
 
 def mate(whitesTurn, board):
@@ -531,7 +516,7 @@ def mate(whitesTurn, board):
     if len(possibleMoves) == 0:
         if Check(whitesTurn, board):
             print(stringTurn + ' is checkmated')
-            return ('mate')
+            return (not whitesTurn)
         else:
             print(stringTurn + ': stalemate')
             return ('stalemate')
@@ -542,7 +527,6 @@ def mate(whitesTurn, board):
 def check_promotion(takeSquare, board): # takeSquare - (i , j) 
     
     position = takeSquare[0] 
-
 
     #verific daca e pion alb + daca pozitia pionului este in rank
     if board[takeSquare] == 11 and position == 7: #nu functioneaza cu cs.p, asa ca am pus valorile date in clasa, 1 si 11
@@ -717,59 +701,20 @@ def clocks_update():
     else:
         start_time_black = None
 
+def display_text(text, color, position):
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, position)
 
-def updateCastling(board): #alb jos
-    global leftCastleWhite, rightCastleWhite
-    global leftCastleBlack, rightCastleBlack
-    
-    if board[7][1] != cs.R:
-        leftCastleWhite = False
 
-    if board[7][7] != cs.R:
-        rightCastleWhite = False
+def displayWinner(whiteWon):
+    if whiteWon == 'stalemate':
+        display_text("Stalemate", BLACK, (SIZE + PANEL_WIDTH/2, SIZE//2))
+    elif whiteWon == True:
+        display_text("White won", BLACK, (SIZE + PANEL_WIDTH/2, SIZE//2))
+    elif whiteWon == False:
+        display_text("Black won", BLACK, (SIZE + PANEL_WIDTH/2, SIZE//2))
 
-    if board[0][1] != cs.r:
-        leftCastleBlack = False
 
-    if board[0][7] != cs.r:
-        rightCastleBlack = False
-
-    if board[7][4] != cs.K:
-        leftCastleWhite = False
-        rightCastleWhite = False
-
-    if board[0][4] != cs.k:
-        leftCastleBlack = False
-        rightCastleBlack = False
-
-def Castle(start, finish, board):
-    
-    whiteToMove = True if colour(board[start]) == 'White' else False
-    
-    if board[start] == cs.K: 
-        
-        if finish == (7,0):
-
-            leftEmptyW = (board[7][1], board[7][2], board[7][3]) == (0, 0, 0)
-            if leftCastleWhite and leftEmptyW:
-                return True
-        elif finish == (7,7):        
-
-            rightEmptyW = (board[7][5], board[7][6]) == (0, 0)
-            if rightCastleWhite and rightEmptyW:
-                return True
-
-    elif board[start] == cs.k:
-        
-        leftEmptyB = (board[0][1], board[0][2], board[0][3]) == (0, 0, 0)
-        if leftCastleBlack and leftEmptyB:
-            return True
-        
-        rightEmptyB = (board[0][5], board[0][6]) == (0, 0)
-        if rightCastleBlack and rightEmptyB:
-            return True
-    
-    return False
 
 # Main loop
 def main():
@@ -779,7 +724,7 @@ def main():
     global move_counter
     global start_time_black, start_time_white
     global running_b_clock, running_w_clock
-
+    global loser
 
     set_start()
     
@@ -831,6 +776,14 @@ def main():
         clocks_update()
 
         draw_panel()
+
+        if loser == 'stalemate':
+            display_text("Stalemate", BLACK, (SIZE + PANEL_WIDTH/2, 0.8*SIZE//2 ))
+            
+        elif loser == 'White':
+            display_text("Black won!", BLACK, (SIZE + PANEL_WIDTH/2, 0.8*SIZE//2))
+        elif loser == 'Black':
+            display_text("White won!", BLACK, (SIZE + PANEL_WIDTH/2, 0*SIZE//2))
 
         #timer stops + game stops at 50 moves - 50 per player
         if move_counter == 100:
