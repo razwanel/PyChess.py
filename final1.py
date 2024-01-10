@@ -21,7 +21,7 @@ BLACK =(0, 0, 0)
 PINK = (199, 21, 133)
 BROWN = (58, 31 ,4)
 
-START_TIME = 60*5
+START_TIME = 15
 
 highlightBool = False
 activeSquare = 0
@@ -565,40 +565,47 @@ def is_captured(start_position, end_position, board):
 #displaying clock + additional info
 def draw_panel():
     global white_time_played, black_time_played
-
+    global loser
   #convert seconds to string in format 00:00:00
     w_time_format = time.strftime('%H:%M:%S', time.gmtime(START_TIME - white_time_played))
     b_time_format = time.strftime('%H:%M:%S', time.gmtime(START_TIME - black_time_played))
 
-#clocks:
-    #updating the clock display:
-        # render + blit + center
+    #clocks:
+        #updating the clock display:
+            # render + blit + center
+    
+    if white_time_played < START_TIME and black_time_played < START_TIME and loser == None:
+            # white player:
+        clock_surface_white.fill(WHITE)
+        text_clock_w = clock_font.render(w_time_format, True, BLACK) #clock for person that plays with white pieces
+        text_clock_rect = text_clock_w.get_rect(center=clock_surface_white.get_rect().center)
+        clock_surface_white.fill(WHITE)
+        clock_surface_white.blit(text_clock_w, text_clock_rect)
 
-        # white player:
-    clock_surface_white.fill(WHITE)
-    text_clock_w = clock_font.render(w_time_format, True, BLACK) #clock for person that plays with white pieces
-    text_clock_rect = text_clock_w.get_rect(center=clock_surface_white.get_rect().center)
-    clock_surface_white.fill(WHITE)
-    clock_surface_white.blit(text_clock_w, text_clock_rect)
+            # black player
+        clock_surface_black.fill(WHITE)
+        text_clock_b = clock_font.render(b_time_format, True, BLACK) #clock for person that plays with white pieces
+        text_clock_rect = text_clock_b.get_rect(center=clock_surface_black.get_rect().center)
+        clock_surface_black.fill(WHITE)
+        clock_surface_black.blit(text_clock_b, text_clock_rect)
 
-        # black player
-    clock_surface_black.fill(WHITE)
-    text_clock_b = clock_font.render(b_time_format, True, BLACK) #clock for person that plays with white pieces
-    text_clock_rect = text_clock_b.get_rect(center=clock_surface_black.get_rect().center)
-    clock_surface_black.fill(WHITE)
-    clock_surface_black.blit(text_clock_b, text_clock_rect)
+        # render the clock onto display
 
-    # render the clock onto display
+            #white player:
+        white_position_x = 900
+        white_position_y = 680
+        screen.blit(clock_surface_white, (white_position_x, white_position_y))
 
-        #white player:
-    white_position_x = 900
-    white_position_y = 680
-    screen.blit(clock_surface_white, (white_position_x, white_position_y))
+            #black player:
+        black_position_x = 900
+        black_position_y = 25
+        screen.blit(clock_surface_black, (black_position_x, black_position_y))
+    
+    if white_time_played >= START_TIME:
+        loser = 'White'
+    elif black_time_played >= START_TIME:
+        loser = 'Black'
 
-        #black player:
-    black_position_x = 900
-    black_position_y = 25
-    screen.blit(clock_surface_black, (black_position_x, black_position_y))
 
 #captured pieces:
     #panel:  
@@ -701,6 +708,8 @@ def clocks_update():
     else:
         start_time_black = None
 
+        return white_time_played, black_time_played
+
 def display_text(text, color, position):
     text_surface = font.render(text, True, color)
     screen.blit(text_surface, position)
@@ -748,12 +757,12 @@ def main():
                 if event.button == 1:
 
                     activeSquare = mouse_square(event.pos)
-
-                    if turn( pieces[activeSquare], activePlayer ) :
-                        highlightBool = True
-                        
-                    else:
-                        highlightBool = False
+                    if activeSquare[1] < 8:
+                        if turn( pieces[activeSquare], activePlayer ):
+                            highlightBool = True
+                            
+                        else:
+                            highlightBool = False
                 
                 else: highlightBool = False
 
@@ -773,7 +782,8 @@ def main():
             move(activeSquare)
         draw_pieces(images)
         
-        clocks_update()
+        
+        clocks_update() 
 
         draw_panel()
 
@@ -783,7 +793,7 @@ def main():
         elif loser == 'White':
             display_text("Black won!", BLACK, (SIZE + PANEL_WIDTH/2, 0.8*SIZE//2))
         elif loser == 'Black':
-            display_text("White won!", BLACK, (SIZE + PANEL_WIDTH/2, 0*SIZE//2))
+            display_text("White won!", BLACK, (SIZE + PANEL_WIDTH/2, 0.8*SIZE//2))
 
         #timer stops + game stops at 50 moves - 50 per player
         if move_counter == 100:
